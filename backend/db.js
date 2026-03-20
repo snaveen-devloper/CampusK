@@ -21,7 +21,7 @@ let isConnected = false;
 async function initDB() {
   if (isConnected) return mongoose.connection;
 
-  const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/campuskarma';
+  const MONGODB_URI = process.env.MONGO_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/campuskarma';
 
   try {
     await mongoose.connect(MONGODB_URI);
