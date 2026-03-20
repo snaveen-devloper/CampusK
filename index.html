@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>CampusKarma — Trade Knowledge. Earn Trust.</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#10b981"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<link rel="stylesheet" href="campuskarma.css?v=20260320b" />
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+<!-- OFFLINE BANNER -->
+<div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--rd);color:#fff;text-align:center;padding:.55rem 1rem;font-size:.8rem;font-weight:700">
+  <i class="ph-fill ph-wifi-slash"></i> You are offline — some features may not be available
+</div>
+
+<!-- SPLASH -->
+<div class="scr on" id="scr-splash">
+  <div class="splash-logo"><div class="splash-mark"><i class="ph-fill ph-graduation-cap"></i></div><span class="splash-name">CampusKarma</span></div>
+  <div class="splash-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- AUTH -->
+<div class="scr" id="scr-auth">
+  <!-- Left Hero Panel -->
+  <div class="auth-hero">
+    <div class="auth-hero-glow"></div>
+    <div class="auth-hero-content">
+      <div class="auth-hero-logo">
+        <div class="auth-hero-mark"><i class="ph-fill ph-graduation-cap"></i></div>
+        <span class="auth-hero-name">CampusKarma</span>
+      </div>
+      <h1 class="auth-hero-headline">Trade Knowledge.<br><span class="auth-hero-accent">Earn Trust.</span></h1>
+      <p class="auth-hero-sub">The peer learning platform where students teach, learn, and grow together — earning real Karma Points along the way.</p>
+      <div class="auth-hero-features">
+        <div class="auth-feat"><div class="auth-feat-icon"><i class="ph-fill ph-video-camera"></i></div><div><div class="auth-feat-title">Live 1-on-1 Sessions</div><div class="auth-feat-desc">Real-time video tutoring with AI-powered quizzes</div></div></div>
+        <div class="auth-feat"><div class="auth-feat-icon"><i class="ph-fill ph-lock-key"></i></div><div><div class="auth-feat-title">End-to-End Encrypted Chat</div><div class="auth-feat-desc">Your conversations, always private and secure</div></div></div>
+        <div class="auth-feat"><div class="auth-feat-icon"><i class="ph-fill ph-trophy"></i></div><div><div class="auth-feat-title">Gamified Learning</div><div class="auth-feat-desc">Earn XP, Karma Points and unlock badges</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="auth-panel">
+    <div class="auth-panel-inner">
+      <!-- Mobile-only logo -->
+      <div class="auth-mobile-logo">
+        <div class="auth-mark-sm"><i class="ph-fill ph-graduation-cap"></i></div>
+        <span class="auth-brand-name-sm">CampusKarma</span>
+      </div>
+
+      <div class="auth-panel-header">
+        <h2 class="auth-panel-title" id="auth-panel-title">Welcome back</h2>
+        <p class="auth-panel-sub" id="auth-panel-sub">Sign in to continue your learning journey</p>
+      </div>
+
+      <div class="auth-tabs">
+        <div class="auth-tab on" id="tab-login" onclick="switchAuthTab('login')">Sign In</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</div>
+      </div>
+
+      <div id="auth-err" class="auth-err" style="display:none"></div>
+
+      <!-- Login Form -->
+      <div class="auth-form on" id="form-login">
+        <div class="fld">
+          <label>Email Address</label>
+          <div class="inp-wrap"><i class="ph ph-envelope inp-icon"></i><input class="inp inp-icon-pad" id="l-email" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+        </div>
+        <div class="fld">
+          <label>Password</label>
+          <div class="inp-wrap"><i class="ph ph-lock inp-icon"></i><input class="inp inp-icon-pad" id="l-pass" type="password" placeholder="Your password" autocomplete="current-password"/></div>
+        </div>
+        <button class="btn-p auth-btn" id="login-btn" onclick="doLogin()">
+          <i class="ph-fill ph-sign-in"></i> Sign In
+        </button>
+        <div class="auth-note">Don't have an account? <span class="auth-link" onclick="switchAuthTab('signup')">Create one free</span></div>
+      </div>
+
+      <!-- Signup Form -->
+      <div class="auth-form" id="form-signup">
+        <div class="fld-row">
+          <div class="fld">
+            <label>Full Name</label>
+            <div class="inp-wrap"><i class="ph ph-user inp-icon"></i><input class="inp inp-icon-pad" id="s-name" type="text" placeholder="Divya Ramesh"/></div>
+          </div>
+          <div class="fld">
+            <label>Email</label>
+            <div class="inp-wrap"><i class="ph ph-envelope inp-icon"></i><input class="inp inp-icon-pad" id="s-email" type="email" placeholder="you@college.edu"/></div>
+          </div>
+        </div>
+        <div class="fld-row">
+          <div class="fld">
+            <label>Class / Year</label>
+            <select class="inp" id="s-cls">
+              <option value="">— Select —</option>
+              <option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
+              <option>1st Year UG</option><option>2nd Year UG</option><option>3rd Year UG</option><option>4th Year UG</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>School / College</label>
+            <div class="inp-wrap"><i class="ph ph-buildings inp-icon"></i><input class="inp inp-icon-pad" id="s-school" type="text" placeholder="SRM Institute"/></div>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Password</label>
+          <div class="inp-wrap"><i class="ph ph-lock inp-icon"></i><input class="inp inp-icon-pad" id="s-pass" type="password" placeholder="Min. 6 characters"/></div>
+        </div>
+        <button class="btn-p auth-btn" id="signup-btn" onclick="doSignup()">
+          <i class="ph-fill ph-rocket-launch"></i> Create Account
+        </button>
+        <div class="auth-note">Already a member? <span class="auth-link" onclick="switchAuthTab('login')">Sign in</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="scr" id="scr-ob">
+  <div class="ob-box">
+    <div class="ob-brand"><div class="ob-brand-mark"><i class="ph-fill ph-graduation-cap"></i></div><div class="ob-brand-name">CampusKarma</div></div>
+    <div class="ob-tag">Set up your loop. Takes 60 seconds.</div>
+    <div class="ob-prog"><div class="op on" id="pp0"></div><div class="op" id="pp1"></div><div class="op" id="pp2"></div></div>
+    <div class="ob-step on" id="obs0">
+      <div class="ob-h">What can you <span style="color:var(--em)">teach?</span></div>
+      <div class="ob-sub">Subjects you're confident in. These earn you Karma Points.</div>
+      <div class="sg-grid" id="teach-grid"></div>
+      <button class="btn-p" onclick="obNext(0)">Continue</button>
+    </div>
+    <div class="ob-step" id="obs1">
+      <div class="ob-h">What do you want to <span style="color:var(--am)">learn?</span></div>
+      <div class="ob-sub">Subjects you need help with. We'll build the perfect loop.</div>
+      <div class="sg-grid" id="learn-grid"></div>
+      <button class="btn-p" onclick="obNext(1)">Continue</button>
+    </div>
+    <div class="ob-step" id="obs2">
+      <div class="ob-h">What's your <span style="color:var(--cy)">native language?</span></div>
+      <div class="ob-sub">Our AI Assistant handles translations, but knowing your native tongue helps us pair you better!</div>
+      <div class="sg-grid" id="lang-grid"></div>
+      <button class="btn-p" onclick="obNext(2)">Launch My Loop</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="scr" id="scr-app">
+  <div class="sb">
+    <div class="sb-logo"><div class="sb-mark"><i class="ph-fill ph-graduation-cap" style="font-size:1.4rem;color:#fff"></i></div><span class="sb-n">CampusKarma</span></div>
+    <div class="nav">
+      <div class="ni on" data-t="home" onclick="goTab('home',this)"><i class="ph ph-house"></i><span class="nl">Home</span></div>
+      <div class="ni" data-t="discover" onclick="goTab('discover',this)"><i class="ph ph-magnifying-glass"></i><span class="nl">Discover</span></div>
+      <div class="ni" data-t="chat" onclick="goTab('chat',this)"><i class="ph ph-chat-circle-text"></i><span class="nl">Chat</span></div>
+      <div class="ni" data-t="notes" onclick="goTab('notes',this)"><i class="ph ph-notebook"></i><span class="nl">Notes</span></div>
+      <div class="ni" data-t="requests" onclick="goTab('requests',this)"><i class="ph ph-users"></i><span class="nl">Requests</span><span class="ni-b" id="nb-req" style="display:none">0</span></div>
+      <div class="ni" data-t="sessions" onclick="goTab('sessions',this)"><i class="ph ph-calendar-blank"></i><span class="nl">Sessions</span></div>
+      <div class="ni" data-t="vid" onclick="goTab('vid',this)"><i class="ph-fill ph-video-camera"></i><span class="nl">1-on-1 Studio</span></div>
+      <div class="ni" data-t="ai" onclick="goTab('ai',this)"><i class="ph ph-robot"></i><span class="nl">AI Insights</span></div>
+      <div class="ni" data-t="store" onclick="goTab('store',this)"><i class="ph ph-shopping-bag"></i><span class="nl">Store</span></div>
+      <div class="ni" data-t="wallet" onclick="goTab('wallet',this)"><i class="ph ph-wallet"></i><span class="nl">Wallet</span></div>
+      <div class="ni" data-t="profile" onclick="goTab('profile',this)"><i class="ph ph-user-circle"></i><span class="nl">Profile</span></div>
+    </div>
+    <div class="sb-bot">
+      <!-- Theme Picker -->
+      <div id="theme-picker" style="display:none;flex-direction:column;gap:6px;padding:8px 10px;background:var(--s1);border-radius:var(--r2);margin:0 8px 8px;border:1px solid var(--bd)">
+        <div style="font-size:.68rem;color:var(--t3);font-weight:700;letter-spacing:.08em;margin-bottom:2px">THEME</div>
+        <div style="display:flex;gap:6px">
+          <button onclick="setTheme('')" title="Emerald" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#06060e,#10b981);border:2px solid var(--bd);cursor:pointer"></button>
+          <button onclick="setTheme('ocean')" title="Ocean" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#020d1a,#06d6c0);border:2px solid var(--bd);cursor:pointer"></button>
+          <button onclick="setTheme('sunset')" title="Sunset" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0e0614,#f97316);border:2px solid var(--bd);cursor:pointer"></button>
+          <button onclick="setTheme('midnight')" title="Midnight" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#000,#7c3aed);border:2px solid var(--bd);cursor:pointer"></button>
+          <button onclick="setTheme('neon')" title="Neon" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#020b07,#39ff14);border:2px solid var(--bd);cursor:pointer"></button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;padding:4px 8px 0">
+        <div class="sb-user" style="flex:1" onclick="goTab('profile',document.querySelector('[data-t=profile]'))">
+          <div class="av" id="sb-av" style="width:28px;height:28px;font-size:.6rem"></div>
+          <div class="sb-uinfo"><div class="sb-uname" id="sb-uname">—</div><div class="sb-ukp" id="sb-ukp">— KP</div></div>
+        </div>
+        <button onclick="document.getElementById('theme-picker').style.display=document.getElementById('theme-picker').style.display==='none'?'flex':'none'" title="Switch Theme" style="padding:6px;border-radius:var(--r1);color:var(--t2);transition:color .2s" onmouseover="this.style.color='var(--em)'" onmouseout="this.style.color='var(--t2)'">
+          <i class="ph ph-palette" style="font-size:1.1rem"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- HOME -->
+    <div class="tab on" id="tab-home">
+      <div class="home-scroll">
+
+        <!-- ── Hero greeting card ── -->
+        <div class="home-hero">
+          <div class="home-hero-bg"></div>
+          <div class="home-hero-inner">
+            <div class="home-hero-top">
+              <div>
+                <div class="home-greet" id="home-greet">Good morning</div>
+                <div class="home-hero-sub">Here's your learning snapshot for today</div>
+              </div>
+              <div class="home-notif-btn" onclick="goTab('requests',document.querySelector('[data-t=requests]'))" title="Requests">
+                <i class="ph ph-bell"></i>
+                <span class="home-notif-dot" id="home-notif-dot" style="display:none"></span>
+              </div>
+            </div>
+            <!-- XP progress inside hero -->
+            <div id="xp-bar-card"></div>
+            <!-- Stat row -->
+            <div class="home-stats">
+              <div class="home-stat">
+                <div class="home-stat-v" id="h-kp" style="color:var(--em)">0</div>
+                <div class="home-stat-l"><i class="ph-fill ph-star"></i> Karma</div>
+              </div>
+              <div class="home-stat-div"></div>
+              <div class="home-stat">
+                <div class="home-stat-v" id="h-sess">0</div>
+                <div class="home-stat-l"><i class="ph-fill ph-video-camera"></i> Sessions</div>
+              </div>
+              <div class="home-stat-div"></div>
+              <div class="home-stat">
+                <div class="home-stat-v" id="h-badges" style="color:var(--am)">0</div>
+                <div class="home-stat-l"><i class="ph-fill ph-medal"></i> Badges</div>
+              </div>
+              <div class="home-stat-div"></div>
+              <div class="home-stat">
+                <div class="home-stat-v" style="color:var(--cy)"><span id="streak-n">0</span><span style="font-size:.85rem">🔥</span></div>
+                <div class="home-stat-l">Day Streak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Quick actions ── -->
+        <div class="home-section-label">Quick Actions</div>
+        <div class="home-actions">
+          <div class="home-action" onclick="goTab('sessions',document.querySelector('[data-t=sessions]'));openBookModal()">
+            <div class="ha-icon" style="background:rgba(16,185,129,.12);color:var(--em)"><i class="ph-fill ph-video-camera"></i></div>
+            <div class="ha-label">Start Session</div>
+          </div>
+          <div class="home-action" onclick="goTab('discover',document.querySelector('[data-t=discover]'))">
+            <div class="ha-icon" style="background:rgba(99,102,241,.12);color:var(--bl)"><i class="ph-fill ph-magnifying-glass"></i></div>
+            <div class="ha-label">Find Peers</div>
+          </div>
+          <div class="home-action" onclick="goTab('sessions',document.querySelector('[data-t=sessions]'));openGroupRoomModal()">
+            <div class="ha-icon" style="background:rgba(6,182,212,.12);color:var(--cy)"><i class="ph-fill ph-users-three"></i></div>
+            <div class="ha-label">Group Room</div>
+          </div>
+          <div class="home-action" onclick="goTab('ai',document.querySelector('[data-t=ai]'))">
+            <div class="ha-icon" style="background:rgba(245,158,11,.12);color:var(--am)"><i class="ph-fill ph-robot"></i></div>
+            <div class="ha-label">AI Insights</div>
+          </div>
+        </div>
+
+        <!-- ── Daily Quests ── -->
+        <div class="home-section-row">
+          <div class="home-section-label" style="margin-bottom:0">Daily Quests</div>
+          <span class="home-section-sub">Resets at midnight</span>
+        </div>
+        <div id="quests-list" class="home-quests"></div>
+
+        <!-- ── Top Matches ── -->
+        <div class="home-section-row">
+          <div class="home-section-label" style="margin-bottom:0">Top Matches</div>
+          <button class="home-see-all" onclick="goTab('discover',document.querySelector('[data-t=discover]'))">See all</button>
+        </div>
+        <div id="home-matches"></div>
+
+        <!-- ── Live Activity + Leaderboard ── -->
+        <div class="home-bottom-grid">
+          <div class="home-panel">
+            <div class="home-panel-title"><i class="ph-fill ph-activity"></i> Live Activity <span id="online-count" class="home-online-badge">—</span></div>
+            <div id="activity-feed"></div>
+          </div>
+          <div class="home-panel">
+            <div class="home-panel-title"><i class="ph-fill ph-trophy"></i> Leaderboard</div>
+            <div id="home-lb"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- DISCOVER -->
+    <div class="tab" id="tab-discover">
+      <!-- Header -->
+      <div class="disc-header">
+        <div>
+          <div class="pg-title">Discover</div>
+          <div class="disc-subtitle">Find your learning partners</div>
+        </div>
+        <div class="disc-count-badge" id="disc-count">0 peers</div>
+      </div>
+
+      <!-- Search bar -->
+      <div class="disc-search-wrap">
+        <i class="ph ph-magnifying-glass disc-search-icon"></i>
+        <input id="disc-search" class="disc-search-inp" placeholder="Search by name or subject…" oninput="renderDiscover()" autocomplete="off"/>
+        <button class="disc-search-clear" id="disc-clear-btn" onclick="clearDiscSearch()" style="display:none">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="disc-filters-wrap">
+        <div class="fltrs" id="disc-filters"></div>
+      </div>
+
+      <!-- Peer list -->
+      <div id="disc-list" class="disc-list"></div>
+    </div>
+
+
+    <!-- CHAT -->
+    <div class="tab" id="tab-chat">
+      <div class="chat-left">
+        <div class="chat-left-title"><i class="ph ph-lock-key"></i> Encrypted Chats</div>
+        <div id="chat-conv-list"></div>
+      </div>
+      <div class="chat-panel" id="chat-panel">
+        <div class="chat-empty"><div style="font-size:2rem"><i class="ph-fill ph-chat-circle-dots" style="color:var(--em)"></i></div><div>Select a connected peer to start a secure chat</div><div style="font-size:.75rem;color:var(--t3)">End-to-end encrypted · No phone number needed</div></div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="tab" id="tab-notes">
+      <div class="topbar">
+        <div class="pg-title"><i class="ph ph-notebook"></i> Knowledge Space</div>
+        <div class="tb-r"><button class="btn-sm p" onclick="openNewNoteModal()">+ New Note</button></div>
+      </div>
+      <div class="req-tabs" style="margin-bottom:1rem">
+        <div class="rtab on" onclick="switchNotesTab('all',this)">Community Notes</div>
+        <div class="rtab" onclick="switchNotesTab('mine',this)">My Notes</div>
+      </div>
+      <div id="notes-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+
+    <!-- REQUESTS -->
+    <div class="tab" id="tab-requests">
+      <div class="topbar"><div class="pg-title">Requests</div></div>
+      <div class="req-tabs">
+        <div class="rtab on" onclick="switchReqTab('recv',this)">Received</div>
+        <div class="rtab" onclick="switchReqTab('sent',this)">Sent</div>
+        <div class="rtab" onclick="switchReqTab('connected',this)">Connected</div>
+      </div>
+      <div id="req-list"></div>
+    </div>
+
+    <!-- SESSIONS -->
+    <div class="tab" id="tab-sessions">
+      <div class="topbar"><div class="pg-title">Sessions</div><div class="tb-r">
+        <button class="btn-sm o" onclick="openGroupRoomModal()" style="margin-right:.4rem"><i class="ph ph-users"></i> Group Room</button>
+        <button class="btn-sm p" onclick="openBookModal()">+ Book</button>
+      </div></div>
+      <div class="cal" id="cal-el"></div>
+      <div class="sh"><h3 id="sess-date-ttl">All Sessions</h3></div>
+      <div id="sess-list"></div>
+    </div>
+
+    <!-- AI INSIGHTS -->
+    <div class="tab" id="tab-ai">
+      <div class="topbar"><div class="pg-title"><i class="ph ph-robot"></i> AI Insights</div></div>
+      <div class="ai-score-card">
+        <div class="ai-score-num" id="ai-teaching-score">—</div>
+        <div class="ai-score-lbl">Teaching Score / 10</div>
+        <div style="margin-top:.75rem;font-size:.75rem;color:var(--t2)">Powered by AI analysis of your teaching sessions</div>
+      </div>
+      <div class="ai-metrics">
+        <div class="ai-metric"><div class="ai-metric-v" id="ai-rep-score" style="color:var(--em)">—</div><div class="ai-metric-l">Reputation Score</div></div>
+        <div class="ai-metric"><div class="ai-metric-v" id="ai-sessions-count" style="color:var(--cy)">—</div><div class="ai-metric-l">Sessions Analyzed</div></div>
+      </div>
+      <!-- Analytics Cards -->
+      <div class="sh"><h3><i class="ph ph-chart-bar"></i> Your Analytics</h3></div>
+      <div class="analytics-grid" id="analytics-grid">
+        <div class="an-card"><div class="an-icon" style="color:var(--em)"><i class="ph-fill ph-calendar-check"></i></div><div class="an-val" id="an-sessions">-</div><div class="an-lbl">Sessions This Week</div></div>
+        <div class="an-card"><div class="an-icon" style="color:var(--am)"><i class="ph-fill ph-arrow-circle-up"></i></div><div class="an-val" id="an-kp-earned">-</div><div class="an-lbl">KP Earned (7d)</div></div>
+        <div class="an-card"><div class="an-icon" style="color:var(--cy)"><i class="ph-fill ph-target"></i></div><div class="an-val" id="an-accuracy">-</div><div class="an-lbl">Quiz Accuracy</div></div>
+        <div class="an-card"><div class="an-icon" style="color:var(--bl)"><i class="ph-fill ph-users"></i></div><div class="an-val" id="an-online">-</div><div class="an-lbl">Online Now</div></div>
+      </div>
+      <!-- Top Subjects Bar Chart -->
+      <div class="sh" style="margin-top:.5rem"><h3>Top Subjects Taught</h3></div>
+      <div id="an-subjects-chart" style="padding:0 .5rem"></div>
+      <div class="dvd"></div>
+      <div class="sh"><h3><i class="ph ph-chart-bar"></i> Recent Feedback</h3></div>
+      <div id="ai-feedback-list"></div>
+    </div>
+
+    <!-- STORE -->
+    <div class="tab" id="tab-store">
+      <!-- Header -->
+      <div class="disc-header" style="margin-bottom:1rem">
+        <div>
+          <div class="pg-title">Karma Store</div>
+          <div class="disc-subtitle">Supercharge your learning with power-ups</div>
+        </div>
+        <div class="disc-count-badge" id="store-bal" style="color:var(--am);background:var(--amb);border-color:var(--ambd)">0 KP</div>
+      </div>
+      <div class="store-grid" id="store-grid"></div>
+    </div>
+
+
+    <!-- WALLET -->
+    <div class="tab" id="tab-wallet">
+      <div class="topbar"><div class="pg-title">Karma Wallet</div></div>
+      <div class="w-hero">
+        <div class="w-bal" id="w-bal">0</div>
+        <div class="w-lbl">Karma Points Available</div>
+        <div class="w-acts">
+          <button class="btn-sm p" onclick="openBookModal()">Spend KP</button>
+          <button class="btn-sm o" onclick="toast('Complete sessions to earn more KP!','ok')">Earn More</button>
+          <button class="btn-sm a" onclick="buyInstant()"><i class="ph-fill ph-lightning" style="margin-right:4px;"></i>+100 Instant</button>
+        </div>
+      </div>
+      <!-- Rank progress card -->
+      <div id="w-rank-card" style="margin-bottom:.75rem"></div>
+      <div class="sh"><h3>Transactions</h3></div>
+      <div id="tx-list"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="tab" id="tab-profile">
+      <div class="topbar">
+        <div class="pg-title">Profile</div>
+        <div class="tb-r" style="display:flex;align-items:center;gap:.5rem">
+          <button class="icon-toggle-btn" id="theme-toggle-btn" onclick="toggleThemeMode()" title="Toggle light/dark mode">
+            <i class="ph ph-sun" id="theme-icon"></i>
+          </button>
+          <button class="btn-sm o" onclick="doLogout()"><i class="ph ph-sign-out"></i> Sign Out</button>
+        </div>
+      </div>
+
+      <!-- Profile hero card -->
+      <div class="prof-hero-card">
+        <!-- Avatar with edit overlay -->
+        <div class="prof-av-wrap" onclick="openAvatarPicker()">
+          <div class="av prof-av" id="pr-av" style="width:72px;height:72px;font-size:1.1rem;border:2.5px solid var(--embd)"></div>
+          <div class="prof-av-edit"><i class="ph-fill ph-camera"></i></div>
+        </div>
+        <!-- Name + edit -->
+        <div class="prof-name-row">
+          <div class="prof-name-wrap">
+            <div class="pn" id="pr-name">—</div>
+            <button class="prof-edit-btn" onclick="openNameEdit()" title="Edit name"><i class="ph ph-pencil-simple"></i></button>
+          </div>
+          <div class="pc" id="pr-cls">—</div>
+          <div class="pk" id="pr-kp">— KP</div>
+          <!-- Karma Rank badge -->
+          <div id="pr-rank-badge"></div>
+          <div id="pr-teaching-badge" style="display:none;align-items:center;gap:.35rem;margin-top:.4rem;font-size:.73rem;color:var(--em);font-weight:700">
+            <i class="ph-fill ph-star"></i> Teaching Score: <span class="ts-val">0</span>/10
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit name modal (inline collapse) -->
+      <div class="prof-edit-panel" id="prof-edit-panel" style="display:none">
+        <div class="fld">
+          <label>Display Name</label>
+          <input class="inp" id="edit-name-inp" type="text" placeholder="Your name" maxlength="40"/>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem">
+          <button class="btn-p" style="flex:1;padding:.65rem" onclick="saveProfileName()">Save</button>
+          <button class="btn-g" style="flex:1;padding:.65rem" onclick="closeNameEdit()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="prof-sec">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+          <div class="prof-sec-t" style="margin-bottom:0">My Interests</div>
+          <button class="btn-sm o" onclick="openEditInterests()"><i class="ph ph-pencil-simple" style="margin-right:4px;"></i>Edit</button>
+        </div>
+        <div id="pr-subj" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+      </div>
+      <div class="prof-sec"><div class="prof-sec-t">Stats</div><div class="stats-g" id="pr-stats"></div></div>
+      <div class="prof-sec"><div class="prof-sec-t">Badges</div><div class="badge-grid" id="pr-badges"></div></div>
+    </div>
+
+    <!-- Avatar Editor Modal -->
+    <div class="ovl" id="avatar-picker-modal">
+      <div class="modal" style="max-width:360px">
+        <div class="modal-title">Customize Avatar</div>
+        <div style="text-align:center;margin:1.5rem 0;position:relative">
+          <div id="avatar-preview-container" style="display:inline-block;width:120px;height:120px;border-radius:50%;background:var(--s2);border:3px solid var(--bd2);box-shadow:0 8px 20px rgba(0,0,0,0.15)"></div>
+        </div>
+        <div class="sh" style="margin-bottom:.5rem;margin-top:0"><h3>Style Packs</h3></div>
+        <div id="avatar-style-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.5rem">
+          <button class="btn-sm b av-style-btn" onclick="setAvatarStyle('adventurer')">Adventurer</button>
+          <button class="btn-sm b av-style-btn" onclick="setAvatarStyle('bottts')">Robots</button>
+          <button class="btn-sm b av-style-btn" onclick="setAvatarStyle('fun-emoji')">Emojis</button>
+          <button class="btn-sm b av-style-btn" onclick="setAvatarStyle('initials')">Initials</button>
+        </div>
+        <div style="display:flex;gap:.75rem">
+          <button class="btn-sm o" style="flex:1;padding:.65rem" onclick="shuffleAvatar()"><i class="ph-fill ph-dice-three" style="font-size:1.1rem"></i> Shuffle</button>
+          <button class="btn-sm p" style="flex:1;padding:.65rem" onclick="saveAvatar()"><i class="ph-bold ph-check" style="font-size:1.1rem"></i> Save</button>
+        </div>
+        <button class="btn-g" style="width:100%;margin-top:.75rem;padding:.65rem" onclick="closeOvl('avatar-picker-modal')">Cancel</button>
+      </div>
+    </div>
+
+
+
+    <!-- 1-ON-1 STUDIO TAB -->
+    <div class="tab" id="tab-vid">
+      <div class="topbar">
+        <div class="pg-title"><i class="ph-fill ph-video-camera"></i> 1-on-1 Studio</div>
+        <div id="rtc-diagnosis" style="margin-left:auto;padding-right:1rem"></div>
+      </div>
+      
+      <!-- Blank State (shown when not in a call) -->
+      <div id="vid-blank" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t2)">
+        <i class="ph-fill ph-video-camera-slash" style="font-size:3rem;margin-bottom:1rem;color:var(--bd)"></i>
+        <h3 style="color:var(--t1)">No Active Session</h3>
+        <p style="font-size:.85rem;margin-bottom:1.5rem">You are not currently in a video call.</p>
+        <div style="display:flex;gap:1.5rem">
+          <button class="btn-p" onclick="goTab('sessions', document.querySelector('[data-t=sessions]'))">Go to Sessions Calendar</button>
+          <button class="btn-g" onclick="testMyCamera()"><i class="ph ph-wrench"></i> Test My Camera</button>
+        </div>
+      </div>
+
+      <!-- Active Call Container -->
+      <div id="vid-active" style="display:none;flex-direction:column;flex:1;width:100%;max-width:680px;margin:0 auto;position:relative;padding-top:.5rem">
+        <div class="vid-info" style="position:static;background:transparent;padding:0;margin-bottom:.5rem;justify-content:flex-start;gap:1rem">
+          <div class="vid-pname" id="vid-pname" style="font-size:1.1rem">—</div>
+          <div class="vid-subj" id="vid-subj" style="border:none">—</div>
+          <div class="vid-live">● LIVE</div>
+        </div>
+  <div class="vid-wrap">
+    <!-- Remote peer full-screen video -->
+    <video id="vid-remote" autoplay playsinline webkit-playsinline class="vid-remote-el"></video>
+    <!-- Peer avatar shown until stream arrives -->
+    <div class="vid-main"><div class="av" id="vid-main-av" style="width:80px;height:80px;font-size:1.4rem"></div></div>
+    <!-- Local PiP -->
+    <div class="vid-pip-wrap">
+      <video id="vid-local" autoplay playsinline webkit-playsinline muted class="vid-local-el"></video>
+      <div id="vid-local-placeholder" class="vid-cam-off" style="display:none">
+        <i class="ph-fill ph-video-camera-slash" style="font-size:1.4rem;color:var(--t3)"></i>
+      </div>
+    </div>
+    <div class="vid-lbl" id="vid-lbl">You</div>
+  <!-- Connection quality + E2E badge row -->
+  <div style="position:absolute;top:10px;right:10px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;z-index:10">
+    <div class="vid-enc" id="vid-enc"><i class="ph-fill ph-lock-key"></i> E2E Encrypted</div>
+    <div class="vid-enc" id="vid-quality" style="color:var(--t3)"></div>
+    <div class="vid-enc" id="vid-throughput" style="color:var(--t3);font-size:.58rem"></div>
+  </div>
+    <div class="vid-subtitles" id="vid-subtitles"></div>
+  </div>
+  <!-- Teacher Pulse Check panel -->
+  <div class="teacher-quiz-panel" id="teacher-quiz-panel">
+    <h4><i class="ph-fill ph-lightning" style="color:var(--am)"></i> Pulse Check — Push a question to your student</h4>
+    <div style="font-size:.72rem;color:var(--t3)">Generating questions…</div>
+  </div>
+  <!-- Mastery Progress Bar -->
+  <div class="mastery-progress-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem">
+      <span style="font-size:.68rem;font-weight:700;color:var(--t2)"><i class="ph-fill ph-shield-check" style="color:var(--em);margin-right:3px"></i>Learning Verification</span>
+      <span class="mastery-label" id="mastery-label">No quiz questions yet</span>
+    </div>
+    <div class="mastery-track"><div class="mastery-bar" id="mastery-bar" style="width:0%"></div></div>
+  </div>
+  <div class="pomo"><i class="ph ph-timer" style="margin-right:4px;"></i><span>Pomodoro:</span><span class="pomo-timer" id="pomo-timer">25:00</span><button class="btn-sm o" onclick="togglePomo()">Start</button></div>
+  <div class="vid-timer" id="vid-timer">00:00</div>
+  <!-- Video Chat Panel -->
+  <div id="vid-chat-panel" style="display:none;position:absolute;top:0;right:0;width:320px;height:100%;background:var(--bg);border-left:1px solid var(--bd);z-index:9;flex-direction:column">
+    <div style="padding:1rem;border-bottom:1px solid var(--bd);font-weight:bold;display:flex;justify-content:space-between">
+      <span>Session Chat</span>
+      <button class="btn-sm" onclick="document.getElementById('vid-chat-panel').style.display='none'"><i class="ph ph-x"></i></button>
+    </div>
+    <div id="vid-chat-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:8px;font-size:.85rem"></div>
+    <div style="padding:1rem;border-top:1px solid var(--bd);display:flex;gap:8px">
+      <input id="vid-chat-input" class="inp" placeholder="Type..." style="flex:1" onkeydown="if(event.key==='Enter')sendSessionChatMsg(this.value)"/>
+      <button class="btn-p" onclick="sendSessionChatMsg(document.getElementById('vid-chat-input').value)">Send</button>
+    </div>
+  </div>
+
+  <!-- Whiteboard Panel -->
+  <div id="whiteboard-panel" style="display:none;position:absolute;inset:0;background:#fff;z-index:10;flex-direction:column">
+    <div id="wb-toolbar" style="padding:8px;background:#f8f9fa;border-bottom:1px solid #ddd;display:flex;gap:8px;align-items:center">
+      <button class="btn-sm p" onclick="setWbColor('#000')">⬛</button>
+      <button class="btn-sm p" onclick="setWbColor('#e74c3c')">🟥</button>
+      <button class="btn-sm p" onclick="setWbColor('#3498db')">🟦</button>
+      <button class="btn-sm p" onclick="setWbColor('#2ecc71')">🟩</button>
+      <button class="btn-sm p" onclick="setWbTool('highlighter')">Highlight</button>
+      <div style="width:1px;height:20px;background:#ccc;margin:0 4px"></div>
+      <button class="btn-sm p" onclick="setWbSize(2)">Thin</button>
+      <button class="btn-sm p" onclick="setWbSize(5)">Med</button>
+      <button class="btn-sm p" onclick="setWbSize(10)">Thick</button>
+      <div style="width:1px;height:20px;background:#ccc;margin:0 4px"></div>
+      <button class="btn-sm o" onclick="setWbTool('eraser')">Eraser</button>
+      <button class="btn-sm o" onclick="clearWhiteboard(true)">Clear</button>
+      <div style="flex:1"></div>
+      <button class="btn-sm r" onclick="closeWhiteboard()">Close</button>
+    </div>
+    <canvas id="wb-canvas" style="flex:1;cursor:crosshair;touch-action:none"></canvas>
+  </div>
+
+  <div class="vid-ctrl">
+    <div class="vc on" id="vc-mic" onclick="toggleVC('mic')"><i class="ph-fill ph-microphone"></i></div>
+    <div class="vc on" id="vc-cam" onclick="toggleVC('cam')"><i class="ph-fill ph-video-camera"></i></div>
+    <div class="vc on" id="vc-screen" onclick="toggleScreenShare()" title="Share Screen"><i class="ph-fill ph-screencast"></i></div>
+    <div class="vc on" id="vc-record" onclick="toggleRecording()" title="Record Session locally"><i class="ph-fill ph-record"></i></div>
+    <div class="vc on" id="vc-chat" onclick="document.getElementById('vid-chat-panel').style.display='flex';" title="Text Chat"><i class="ph-fill ph-chat-circle-dots"></i><span id="vc-chat-badge" style="display:none;position:absolute;top:0;right:0;width:10px;height:10px;background:var(--rd);border-radius:50%"></span></div>
+    <div class="vc on" id="vc-whiteboard" onclick="initWhiteboard()" title="Collaborative Whiteboard"><i class="ph ph-chalkboard"></i></div>
+    <div class="vc end" id="vc-end" onclick="endVid()"><i class="ph-fill ph-phone-slash"></i></div>
+  </div>
+      </div>
+    </div> <!-- END tab-vid -->
+  </div> <!-- END main -->
+</div> <!-- END scr-app -->
+
+<!-- MODALS -->
+<div class="ovl" id="modal-book">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit">Schedule a Session</div>
+    <div class="fld"><label>Connected Partner</label><select class="inp" id="bk-peer" onchange="updateBkSubj()"></select></div>
+    <div class="fld"><label>Subject</label><select class="inp" id="bk-subj"></select></div>
+    <div class="date-time-row">
+      <div class="fld" style="margin-bottom:0"><label>Date</label><input class="inp" type="date" id="bk-date"/></div>
+      <div class="fld" style="margin-bottom:0"><label>Time</label><input class="inp" type="time" id="bk-time"/></div>
+    </div>
+    <div class="fld" style="margin-top:.85rem"><label>I am</label>
+      <select class="inp" id="bk-role"><option value="teach">Teaching this session (+50 KP)</option><option value="learn">Learning this session (−50 KP)</option></select>
+    </div>
+    <div class="mrow" style="margin-top:1rem"><button class="btn-g" onclick="closeOvl('modal-book')">Cancel</button><button class="btn-p" onclick="confirmBook()">Confirm</button></div>
+  </div>
+</div>
+
+<div class="ovl" id="modal-req">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit">Send Connection Request</div>
+    <div id="req-peer-info" style="margin-bottom:1rem"></div>
+    <div class="fld"><label>Subject to exchange</label><select class="inp" id="req-subj"></select></div>
+    <div class="fld"><label>Note <span style="color:var(--t3)">(optional)</span></label>
+      <textarea class="inp" id="req-note" rows="2" style="resize:none" placeholder="Hey, I can teach you Maths if you help with Chemistry…"></textarea>
+    </div>
+    <div class="mrow"><button class="btn-g" onclick="closeOvl('modal-req')">Cancel</button><button class="btn-p" onclick="confirmReq()">Send Request</button></div>
+  </div>
+</div>
+
+<div class="ovl" id="modal-rate">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit">Rate Your Session</div>
+    <div style="display:flex;gap:6px;justify-content:center;margin-bottom:1.1rem">
+      <span class="star" onclick="setStar(1)"><i class="ph-fill ph-star"></i></span><span class="star" onclick="setStar(2)"><i class="ph-fill ph-star"></i></span>
+      <span class="star" onclick="setStar(3)"><i class="ph-fill ph-star"></i></span><span class="star" onclick="setStar(4)"><i class="ph-fill ph-star"></i></span><span class="star" onclick="setStar(5)"><i class="ph-fill ph-star"></i></span>
+    </div>
+    <div class="fld"><label>Feedback <span style="color:var(--t3)">(optional)</span></label>
+      <textarea class="inp" id="rate-txt" rows="2" style="resize:none" placeholder="Great explanation of the topic…"></textarea>
+    </div>
+    <div class="mrow"><button class="btn-g" onclick="closeOvl('modal-rate')">Skip</button><button class="btn-p" onclick="submitRate()">Submit (+15 KP)</button></div>
+  </div>
+</div>
+
+<div class="ovl" id="modal-interests">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit">Edit Interests</div>
+    <div style="font-size:.78rem;color:var(--t3);margin-bottom:.85rem">Toggle <span style="color:var(--em);font-weight:600">Teach</span> or <span style="color:var(--am);font-weight:600">Learn</span> for each subject.</div>
+    <div id="sei-list"></div>
+    <div class="mrow"><button class="btn-g" onclick="closeOvl('modal-interests')">Cancel</button><button class="btn-p" onclick="saveInterests()">Save Changes</button></div>
+  </div>
+</div>
+
+<div class="ovl" id="modal-report">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit">Report a User</div>
+    <div class="fld"><label>User being reported</label><select class="inp" id="report-peer"></select></div>
+    <div class="report-opts" id="report-opts">
+      <div class="report-opt" onclick="selectReport(this,'harassment')"><div class="check"></div><span style="font-size:.83rem;font-weight:600">Harassment or Bullying</span></div>
+      <div class="report-opt" onclick="selectReport(this,'inappropriate')"><div class="check"></div><span style="font-size:.83rem;font-weight:600">Inappropriate Content</span></div>
+      <div class="report-opt" onclick="selectReport(this,'spam')"><div class="check"></div><span style="font-size:.83rem;font-weight:600">Spam or Fake Profile</span></div>
+    </div>
+    <div class="fld"><label>Additional details</label>
+      <textarea class="inp" id="report-detail" rows="2" style="resize:none" placeholder="Describe what happened…"></textarea>
+    </div>
+    <div class="mrow"><button class="btn-g" onclick="closeOvl('modal-report')">Cancel</button><button class="btn-p" onclick="submitReport()">Submit Report</button></div>
+  </div>
+</div>
+
+<!-- SESSION REPORT MODAL -->
+<div class="ovl" id="modal-session-report">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit"><i class="ph-fill ph-chart-bar" style="margin-right:6px"></i>Session Report</div>
+    <div class="sr-row"><span class="sr-label">Subject</span><span class="sr-value" id="sr-subject">—</span></div>
+    <div class="sr-row"><span class="sr-label">Duration</span><span class="sr-value" id="sr-duration">—</span></div>
+    <div class="sr-row"><span class="sr-label">Pulse Checks</span><span class="sr-value" id="sr-quiz">—</span></div>
+    <div class="sr-row"><span class="sr-label">XP Earned</span><span class="sr-value" id="sr-xp">—</span></div>
+    <!-- Mastery badge (shown only on 100% -->
+    <div id="sr-mastery-badge" style="display:none;align-items:center;gap:.75rem;padding:.85rem 1rem;background:linear-gradient(135deg,var(--emb),var(--amb));border:1.5px solid var(--embd);border-radius:var(--r2);margin-top:.85rem"></div>
+    <div style="margin-top:1rem;padding:.85rem;background:var(--emb);border:1px solid var(--embd);border-radius:var(--r2);font-size:.8rem;color:var(--t2);line-height:1.5">
+      <i class="ph-fill ph-robot" style="margin-right:4px;"></i> AI Teaching Quality analysis will appear in the <strong style="color:var(--em)">AI Insights</strong> tab within moments.
+    </div>
+    <button class="btn-p" style="margin-top:1rem" onclick="closeOvl('modal-session-report')">Continue</button>
+    <button class="btn-g" style="margin-top:.5rem;width:100%" id="sr-download-btn" onclick="downloadTranscript()">
+      <i class="ph ph-download-simple"></i> Download Transcript
+    </button>
+  </div>
+</div>
+
+<!-- QUIZ POPUP (student receives mid-session) -->
+<div id="quiz-popup" class="ovl" style="align-items:flex-end">
+  <div class="quiz-popup-box">
+    <div class="quiz-popup-header">
+      <div class="quiz-popup-title"><i class="ph-fill ph-lightning" style="color:var(--am)"></i> Pulse Check from your teacher!</div>
+      <div class="quiz-timer-badge" id="qp-timer">30s</div>
+    </div>
+    <div class="quiz-question" id="qp-question">Loading question…</div>
+    <div class="qp-options" id="qp-options"></div>
+  </div>
+</div>
+
+<!-- NEW NOTE MODAL -->
+<div class="ovl" id="modal-note">
+  <div class="mbox" style="max-width:600px">
+    <div class="mhandle"></div>
+    <div class="mtit" id="mnote-title">Create Note</div>
+    <input type="hidden" id="mnote-id"/>
+    <div class="fld"><label>Title</label><input class="inp" type="text" id="mnote-name" placeholder="E.g. Calculus Derivatives Cheat Sheet"/></div>
+    <div class="fld">
+      <label>Content (Markdown Supported)</label>
+      <textarea class="inp" id="mnote-content" rows="7" style="resize:vertical;font-family:monospace" placeholder="# Heading&#10;- Point 1&#10;- Point 2"></textarea>
+    </div>
+    <!-- Attachment -->
+    <div class="fld" style="border:1.5px dashed var(--bd2);border-radius:var(--r2);padding:1rem;background:var(--s1)">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;width:100%">
+        <i class="ph ph-paperclip" style="font-size:1.1rem;color:var(--t2)"></i>
+        <span style="color:var(--t2);font-size:.85rem">Attach File (JPG, PNG, PDF, DOCX)</span>
+        <input type="file" id="mnote-file" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.ppt,.pptx,.txt" style="display:none" onchange="previewNoteAttachment(this)">
+      </label>
+      <div id="mnote-file-preview" style="margin-top:8px;display:none;font-size:.8rem;color:var(--em)"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:1rem 0">
+      <input type="checkbox" id="mnote-public" style="width:16px;height:16px;accent-color:var(--em)">
+      <label for="mnote-public" style="font-size:.85rem;color:var(--t2)">Make this note public (viewable by everyone)</label>
+    </div>
+    <div class="mrow">
+      <button class="btn-g" onclick="closeOvl('modal-note')">Cancel</button>
+      <button class="btn-p" id="save-note-btn" onclick="saveNote()"><i class="ph ph-floppy-disk"></i> Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE VIEW MODAL -->
+<div class="ovl" id="modal-view-note">
+  <div class="mbox" style="max-width:700px">
+    <div class="mhandle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+      <div>
+        <div class="mtit" id="vnote-title" style="margin-bottom:4px;font-size:1.4rem"></div>
+        <div style="font-size:.75rem;color:var(--t3)" id="vnote-meta"></div>
+      </div>
+      <div style="display:flex;gap:8px" id="vnote-acts"></div>
+    </div>
+    <div class="inp" id="vnote-content" style="background:var(--s2);border:none;min-height:250px;font-size:.9rem;line-height:1.6;white-space:pre-wrap;color:var(--t1)"></div>
+    <!-- Attachment preview -->
+    <div id="vnote-attachment" style="display:none;margin-top:1rem;padding:.85rem;background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r2)"></div>
+    <div class="mrow" style="margin-top:1.25rem">
+      <button class="btn-p" onclick="closeOvl('modal-view-note')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div id="levelup">
+  <div class="confetti" id="confetti-el"></div>
+  <div class="lu-badge" id="lu-badge"></div>
+  <div class="lu-title">Level Up!</div>
+  <div class="lu-sub" id="lu-sub"></div>
+  <button class="btn-p" style="width:200px;margin-top:1rem" onclick="document.getElementById('levelup').style.display='none'">Continue</button>
+</div>
+
+<!-- GROUP STUDY ROOM MODAL -->
+<div class="ovl" id="modal-group-room">
+  <div class="mbox"><div class="mhandle"></div><div class="mtit"><i class="ph-fill ph-users" style="margin-right:6px;color:var(--cy)"></i>Group Study Room</div>
+    <div class="req-tabs" style="margin-bottom:1rem">
+      <div class="rtab on" id="gr-tab-create" onclick="switchGRTab('create')">Create Room</div>
+      <div class="rtab" id="gr-tab-join" onclick="switchGRTab('join')">Join Room</div>
+    </div>
+    <!-- Create -->
+    <div id="gr-create">
+      <div class="fld"><label>Subject</label><select class="inp" id="gr-subject"></select></div>
+      <div class="fld"><label>Max Participants</label>
+        <select class="inp" id="gr-capacity">
+          <option value="3">3 people</option>
+          <option value="4" selected>4 people</option>
+          <option value="5">5 people</option>
+          <option value="6">6 people</option>
+        </select>
+      </div>
+      <div id="gr-room-code-display" style="display:none;text-align:center;padding:1rem;background:var(--emb);border:1.5px dashed var(--embd);border-radius:var(--r2);margin-bottom:1rem">
+        <div style="font-size:.72rem;color:var(--t3);margin-bottom:.35rem">Share this code with your group</div>
+        <div class="room-code-big" id="gr-created-code"></div>
+      </div>
+      <div class="mrow">
+        <button class="btn-g" onclick="closeOvl('modal-group-room')">Close</button>
+        <button class="btn-p" id="gr-create-btn" onclick="createGroupRoom()">Create Room</button>
+      </div>
+    </div>
+    <!-- Join -->
+    <div id="gr-join" style="display:none">
+      <div class="fld"><label>Room Code</label>
+        <input class="inp" id="gr-join-code" placeholder="Enter 6-character code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.1rem;text-align:center"/>
+      </div>
+      <div id="gr-join-info" style="display:none"></div>
+      <div class="mrow">
+        <button class="btn-g" onclick="closeOvl('modal-group-room')">Cancel</button>
+        <button class="btn-p" onclick="joinGroupRoom()">Join Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast-el"><span id="toast-msg"></span></div>
+
+<script src="js/api.js?v=20260320c"></script>
+<script src="js/state.js?v=20260320c"></script>
+<script src="js/auth.js?v=20260320c"></script>
+<script src="js/ui.js?v=20260320c"></script>
+<script src="js/chat.js?v=20260320c"></script>
+<script src="js/notes.js?v=20260320c"></script>
+<script src="js/webrtc.js?v=20260320c"></script>
+<script src="js/session-quiz.js?v=20260320c"></script>
+<script src="js/rooms.js?v=20260320c"></script>
+<script src="js/gamification.js?v=20260320c"></script>
+<script>
+  // Theme Switcher
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('ck-theme', t);
+    // Update active indicator on swatches
+    document.querySelectorAll('#theme-picker button').forEach((b,i) => {
+      const themes=['','ocean','sunset','midnight','neon'];
+      b.style.outline = themes[i]===t ? '2px solid var(--em)' : 'none';
+      b.style.outlineOffset = '2px';
+    });
+    document.getElementById('theme-picker').style.display = 'none';
+  }
+  // Restore saved theme immediately
+  (function() {
+    const saved = localStorage.getItem('ck-theme') || '';
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+
+  // Register Service Worker for PWA / offline support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(console.error);
+  }
+  // ── Light / Dark theme toggle ──────────────────────────────────────────────
+  (function(){
+    const saved = localStorage.getItem('ck-mode');
+    if(saved) document.documentElement.setAttribute('data-mode', saved);
+    const icon = document.getElementById('theme-icon');
+    if(icon) icon.className = (saved === 'light') ? 'ph ph-moon' : 'ph ph-sun';
+  })();
+
+  function toggleThemeMode(){
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-mode') !== 'light';
+    const next = isDark ? 'light' : 'dark';
+    if(next === 'light'){
+      html.setAttribute('data-mode','light');
+      localStorage.setItem('ck-mode','light');
+    } else {
+      html.removeAttribute('data-mode');
+      localStorage.removeItem('ck-mode');
+    }
+    const icon = document.getElementById('theme-icon');
+    if(icon) icon.className = next === 'light' ? 'ph ph-moon' : 'ph ph-sun';
+  }
+
+  // ── Profile name editing ───────────────────────────────────────────────────
+  function openNameEdit(){
+    const panel = document.getElementById('prof-edit-panel');
+    const inp = document.getElementById('edit-name-inp');
+    inp.value = ME ? ME.name : '';
+    panel.style.display = 'block';
+    setTimeout(() => inp.focus(), 50);
+    inp.onkeydown = e => { if(e.key === 'Enter') saveProfileName(); if(e.key === 'Escape') closeNameEdit(); };
+  }
+
+  function closeNameEdit(){
+    document.getElementById('prof-edit-panel').style.display = 'none';
+  }
+
+  async function saveProfileName(){
+    const inp = document.getElementById('edit-name-inp');
+    const name = inp.value.trim();
+    if(!name){ toast('Name cannot be empty','er'); return; }
+    try {
+      await apiFetch('/users/me', { method: 'PATCH', body: { name } });
+      ME.name = name;
+      syncUI();
+      closeNameEdit();
+      toast('Name updated ✓','ok');
+    } catch(e){ toast(e.message,'er'); }
+  }
+
+  // ── Avatar Generator System ────────────────────────────────────────────────
+  let curAvStyle = 'adventurer';
+  let curAvSeed = '';
+  
+  function openAvatarPicker(){
+    curAvStyle = ME?.avatar ? (ME.avatar_style || 'adventurer') : 'initials';
+    curAvSeed = ME?.avatar ? (ME.avatar_seed || ME.uid) : ME.uid;
+    renderAvatarPreview();
+    openOvl('avatar-picker-modal');
+  }
+
+  function setAvatarStyle(style) {
+    curAvStyle = style;
+    document.querySelectorAll('.av-style-btn').forEach(b => b.classList.remove('p'));
+    const btn = Array.from(document.querySelectorAll('.av-style-btn')).find(b => b.textContent.toLowerCase().includes(style.replace('-','')));
+    if (btn) { btn.classList.remove('b'); btn.classList.add('p'); }
+    renderAvatarPreview();
+  }
+
+  function shuffleAvatar() {
+    if (curAvStyle === 'initials') setAvatarStyle('adventurer');
+    curAvSeed = Math.random().toString(36).substring(7);
+    renderAvatarPreview();
+  }
+
+  function renderAvatarPreview() {
+    const c = document.getElementById('avatar-preview-container');
+    if (!c) return;
+    if (curAvStyle === 'initials') {
+      const col = colorFor(ME.uid);
+      c.innerHTML = `<div style="width:100%;height:100%;border-radius:50%;background:${col}18;color:${col};display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:800">${initials(ME.name)}</div>`;
+    } else {
+      const url = `https://api.dicebear.com/7.x/${curAvStyle}/svg?seed=${curAvSeed}&backgroundColor=transparent`;
+      c.innerHTML = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    }
+  }
+
+  function saveAvatar() {
+    if (curAvStyle === 'initials') {
+      ME.avatar = null;
+      ME.avatar_style = null;
+      ME.avatar_seed = null;
+    } else {
+      ME.avatar = `https://api.dicebear.com/7.x/${curAvStyle}/svg?seed=${curAvSeed}&backgroundColor=transparent`;
+      ME.avatar_style = curAvStyle;
+      ME.avatar_seed = curAvSeed;
+    }
+    // Simple mock persist
+    localStorage.setItem('ck_avatar', ME.avatar || '');
+    localStorage.setItem('ck_avatar_style', ME.avatar_style || '');
+    localStorage.setItem('ck_avatar_seed', ME.avatar_seed || '');
+    
+    syncUI();
+    closeOvl('avatar-picker-modal');
+    toast('Avatar updated! Looking good.', 'ok');
+  }
+
+  // Load avatar on boot 
+  const savedAv = localStorage.getItem('ck_avatar');
+  if (savedAv) {
+    if(!ME) ME = {};
+    ME.avatar = savedAv;
+    ME.avatar_style = localStorage.getItem('ck_avatar_style');
+    ME.avatar_seed = localStorage.getItem('ck_avatar_seed');
+  }
+
+  // ── Discover: clear search ─────────────────────────────────────────────────
+  function clearDiscSearch(){
+    const inp = document.getElementById('disc-search');
+    if(inp){ inp.value = ''; renderDiscover(); }
+    const btn = document.getElementById('disc-clear-btn');
+    if(btn) btn.style.display = 'none';
+  }
+  // Show clear button when typing
+  document.addEventListener('input', e => {
+    if(e.target.id === 'disc-search'){
+      const btn = document.getElementById('disc-clear-btn');
+      if(btn) btn.style.display = e.target.value ? '' : 'none';
+    }
+  });
+
+</script>
+
+</body>
+</html>
