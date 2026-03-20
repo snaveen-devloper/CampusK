@@ -166,3 +166,4 @@ MIT License — free to use, modify, and distribute.
 ## 👥 Team
 
 Built with ❤️ for the hackathon. Powered by caffeine and Karma Points.
+# CampusKarma
