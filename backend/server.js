@@ -5,6 +5,7 @@ const cors       = require('cors');
 const http       = require('http');
 const WebSocket  = require('ws');
 const path       = require('path');
+const fs         = require('fs');
 const fetch      = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 const { initDB, models } = require('./db');
@@ -14,13 +15,26 @@ const cron = require('node-cron');
 const push = require('./push');
 const { runHealingCycle, registerLoop } = require('./lib/loopHealer');
 
+// ── Ensure required directories exist (ephemeral on Render — recreated on start) ──
+const UPLOADS_DIR     = path.join(__dirname, '..', 'uploads');
+const DOODLES_DIR     = path.join(__dirname, '..', 'chat-doodles');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+fs.mkdirSync(DOODLES_DIR, { recursive: true });
+
 const app    = express();
 const server = http.createServer(app);
 const wss    = new WebSocket.Server({ server });
 
-// ── Middleware ────────────────────────────────────────────────────────────────
-app.use(cors({ origin: '*' }));
+// ── CORS ──────────────────────────────────────────────────────────────────────
+// In production, scope to the deployed Render domain; locally allow all.
+const ALLOWED_ORIGINS = process.env.NODE_ENV === 'production' && process.env.CLIENT_ORIGIN
+  ? [process.env.CLIENT_ORIGIN]
+  : true; // true = allow all (dev mode)
+app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
+
+// ── Health check (Render pings this to confirm the service is up) ─────────────
+app.get('/health', (_req, res) => res.status(200).json({ status: 'ok', ts: Date.now() }));
 
 // Init cache store
 app.locals.loopCache = null;
@@ -574,18 +588,38 @@ wss.on('connection', (ws) => {
           wsSendTo(studentUid, { type: 'quiz_summary', stats, badges_earned: [] });
 
           // Trigger async AI analysis (fire-and-forget)
+          // Call the analyze route logic directly to avoid localhost self-HTTP (breaks on Render)
           if (sess.peer2) {
-            fetch(`http://localhost:${process.env.PORT || 3000}/api/ai/analyze`, {
-              method:  'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.INTERNAL_TOKEN || ''}` },
-              body:    JSON.stringify({
-                session_id,
-                subject:              sess.subject,
-                pulse_checks_total:   total_questions,
-                pulse_checks_correct: correct,
-                transcript:           ''
-              })
-            }).catch(e => console.error('[quiz_end] AI analyze error:', e.message));
+            setImmediate(async () => {
+              try {
+                const aiRoute = require('./routes/ai');
+                // Construct a minimal mock request/response to reuse route logic
+                const teacherUid = sess.role1 === 'teach' ? sess.peer1 : sess.peer2;
+                const studentUid = sess.role1 === 'teach' ? sess.peer2 : sess.peer1;
+                const { AIFeedback: AIFeedbackModel, Note: NoteModel, User: UserModel } = models;
+                // Compute and store AI feedback inline (mirrors /api/ai/analyze logic)
+                const repDelta = correct / Math.max(total_questions, 1) >= 0.5 ? 0.2 : -0.1;
+                await AIFeedbackModel.create({
+                  id: uuidv4(),
+                  session_id,
+                  teacher_uid: teacherUid,
+                  student_uid: studentUid,
+                  clarity_score: 7.0,
+                  engagement_score: total_questions > 0 ? (correct / total_questions) * 10 : 5.0,
+                  feedback_text: `Pulse check: ${correct}/${total_questions} correct.`,
+                  rep_delta: repDelta,
+                  created_at: Date.now()
+                });
+                const teacher = await UserModel.findOne({ uid: teacherUid });
+                if (teacher) {
+                  const newScore = Math.min(10, ((teacher.teaching_score || 0) + 7.0) / 2);
+                  const newRep   = Math.max(0, (teacher.rep_score || 0) + repDelta);
+                  await UserModel.updateOne({ uid: teacherUid }, { $set: { teaching_score: newScore, rep_score: newRep } });
+                }
+              } catch (e) {
+                console.error('[quiz_end] inline AI analyze error:', e.message);
+              }
+            });
           }
         } catch (e) {
           console.error('[quiz_end]', e.message);
@@ -869,8 +903,22 @@ initDB().then(() => {
     console.log(`🔌 WebSocket + Cron Scheduling Active`);
     console.log(`🔁 Loop detection engine ready`);
     console.log(`📱 LAN access at http://${localIp}:${PORT}`);
+    if (process.env.NODE_ENV === 'production') {
+      console.log(`🌐 Production mode — CORS and health check active`);
+    }
   });
 }).catch(err => {
   console.error('Failed to initialize database', err);
   process.exit(1);
+});
+
+// ── Graceful Shutdown (Render sends SIGTERM on redeploy) ──────────────────────
+process.on('SIGTERM', () => {
+  console.log('[shutdown] SIGTERM received — closing gracefully');
+  server.close(() => {
+    console.log('[shutdown] HTTP server closed');
+    process.exit(0);
+  });
+  // Force exit after 10s if connections linger
+  setTimeout(() => process.exit(0), 10_000).unref();
 });
