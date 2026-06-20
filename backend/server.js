@@ -264,53 +264,34 @@ wss.on('connection', (ws) => {
 
       case 'webrtc_offer': {
         if (!authedUid) return;
-        try {
-          // Validate session exists between the two peers
-          const sess = await Session.findOne({
-            $or: [
-              { peer1: authedUid, peer2: msg.to },
-              { peer1: msg.to,    peer2: authedUid }
-            ],
-            status: { $in: ['upcoming', 'live', 'active'] }
-          });
-
-          if (!sess) {
-            console.error('[webrtc_offer] No valid session found', {
-              authedUid,
-              to: msg.to,
-              sessionStatus: undefined,
-              hint: 'Expected Session between peers with status upcoming/live/active'
-            });
-            ws.send(JSON.stringify({ type: 'error', message: 'No valid session found to start call' }));
-            return;
-          }
-
-          // Forward offer to recipient
-          wsSendTo(msg.to, {
-            type:       'webrtc_offer',
-            from:       authedUid,
-            offer:      msg.offer,
-            session_id: msg.session_id || sess.id,
-            room_code:  msg.room_code  || sess.room_code
-          });
-
-          // Mark session as live
+        // ── Always relay the offer immediately — never block peer-to-peer signaling ──
+        wsSendTo(msg.to, {
+          type:       'webrtc_offer',
+          from:       authedUid,
+          offer:      msg.offer,
+          session_id: msg.session_id,
+          room_code:  msg.room_code
+        });
+        // Best-effort: mark the session live in DB (fire-and-forget, no gating)
+        Session.findOne({
+          $or: [
+            { peer1: authedUid, peer2: msg.to },
+            { peer1: msg.to,    peer2: authedUid }
+          ],
+          status: { $in: ['upcoming', 'live', 'active'] }
+        }).then(async (sess) => {
+          if (!sess) return;
           await Session.updateOne(
             { id: sess.id },
             { $set: { status: 'live', started_at: Date.now() } }
           );
-
-          // Log to activity
           await Activity.create({
             id:   uuidv4(),
             msg:  `Session started: ${sess.subject}`,
             type: 'session',
             ts:   Date.now()
           });
-        } catch (e) {
-          console.error('[webrtc_offer]', e.message);
-          ws.send(JSON.stringify({ type: 'error', message: e.message }));
-        }
+        }).catch(e => console.warn('[webrtc_offer] session update skipped:', e.message));
         break;
       }
 

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 
-<link rel="stylesheet" href="campuskarma.css?v=20260320b" />
+<link rel="stylesheet" href="campuskarma.css?v=20260620a" />
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
@@ -821,16 +821,16 @@
 <!-- TOAST -->
 <div class="toast" id="toast-el"><span id="toast-msg"></span></div>
 
-<script src="js/api.js?v=20260320c"></script>
-<script src="js/state.js?v=20260320c"></script>
-<script src="js/auth.js?v=20260320c"></script>
-<script src="js/ui.js?v=20260320c"></script>
-<script src="js/chat.js?v=20260320c"></script>
-<script src="js/notes.js?v=20260320c"></script>
-<script src="js/webrtc.js?v=20260320c"></script>
-<script src="js/session-quiz.js?v=20260320c"></script>
-<script src="js/rooms.js?v=20260320c"></script>
-<script src="js/gamification.js?v=20260320c"></script>
+<script src="js/api.js?v=20260620a"></script>
+<script src="js/state.js?v=20260620a"></script>
+<script src="js/auth.js?v=20260620a"></script>
+<script src="js/ui.js?v=20260620a"></script>
+<script src="js/chat.js?v=20260620a"></script>
+<script src="js/notes.js?v=20260620a"></script>
+<script src="js/webrtc.js?v=20260620a"></script>
+<script src="js/session-quiz.js?v=20260620a"></script>
+<script src="js/rooms.js?v=20260620a"></script>
+<script src="js/gamification.js?v=20260620a"></script>
 <script>
   // Theme Switcher
   function setTheme(t) {
@@ -855,11 +855,14 @@
     navigator.serviceWorker.register('/sw.js').catch(console.error);
   }
   // ── Light / Dark theme toggle ──────────────────────────────────────────────
+  // Default is light mode; user can toggle to dark from Profile tab
   (function(){
     const saved = localStorage.getItem('ck-mode');
-    if(saved) document.documentElement.setAttribute('data-mode', saved);
+    const mode = saved || 'light';           // ← default is light
+    document.documentElement.setAttribute('data-mode', mode);
+    if (!saved) localStorage.setItem('ck-mode', 'light');
     const icon = document.getElementById('theme-icon');
-    if(icon) icon.className = (saved === 'light') ? 'ph ph-moon' : 'ph ph-sun';
+    if(icon) icon.className = (mode === 'light') ? 'ph ph-moon' : 'ph ph-sun';
   })();
 
   function toggleThemeMode(){
