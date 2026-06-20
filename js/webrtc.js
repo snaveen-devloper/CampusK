@@ -484,6 +484,8 @@ async function initRTC(peerId, sessId, subject) {
     } else {
       console.log('RTC: I am the receiver. Waiting...');
       updateRTCStatus('Waiting');
+      // Tell caller we are ready, in case they sent the offer while we were offline
+      wsSend({ type: 'session_event', event: 'webrtc_ready', to: peerId });
     }
 
     monitorQuality();
@@ -1110,6 +1112,20 @@ function installWebRTCHandlers() {
       toast('Peer is sharing screen', 'ok');
     } else if (msg.event === 'screen_share_stopped') {
       toast('Screen share ended', 'ok');
+    } else if (msg.event === 'webrtc_ready') {
+      console.log('RTC: Peer is ready. Checking if we need to re-offer...', msg.from);
+      if (pc && pc.signalingState !== 'closed') {
+        const myUid = (typeof ME !== 'undefined' && ME && ME.uid) ? ME.uid : 'guest';
+        const isCaller = myUid < msg.from;
+        if (isCaller) {
+           console.log('RTC: Re-sending offer to ready peer...');
+           pc.createOffer().then(offer => {
+             return pc.setLocalDescription(offer).then(() => {
+               wsSend({ type: 'webrtc_offer', to: msg.from, offer });
+             });
+           }).catch(e => console.warn('Re-offer failed', e));
+        }
+      }
     } else if (msg.event === 'whiteboard_stroke') {
       initWhiteboard();
       handleRemoteWhiteboardStroke(msg.data);
