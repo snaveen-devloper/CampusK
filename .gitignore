@@ -50,3 +50,10 @@ build/
 # ─── OS generated ────────────────────────────────────────────────────────────
 desktop.ini
 ehthumbs.db
+
+# ─── Office temp & lock files ─────────────────────────────────────────────────
+~$*
+*.pptx
+*.ppt
+*.docx
+*.xlsx

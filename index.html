@@ -84,6 +84,14 @@
 
       <!-- Signup Form -->
       <div class="auth-form" id="form-signup">
+        <div class="fld">
+          <label>I am registering as a...</label>
+          <select class="inp" id="s-usertype">
+            <option value="">— Select Role —</option>
+            <option value="mentee">Student (Mentee)</option>
+            <option value="mentor">Volunteer (Mentor)</option>
+          </select>
+        </div>
         <div class="fld-row">
           <div class="fld">
             <label>Full Name</label>
@@ -91,26 +99,28 @@
           </div>
           <div class="fld">
             <label>Email</label>
-            <div class="inp-wrap"><i class="ph ph-envelope inp-icon"></i><input class="inp inp-icon-pad" id="s-email" type="email" placeholder="you@college.edu"/></div>
+            <div class="inp-wrap"><i class="ph ph-envelope inp-icon"></i><input class="inp inp-icon-pad" id="s-email" type="email" placeholder="you@example.com"/></div>
           </div>
         </div>
         <div class="fld-row">
           <div class="fld">
-            <label>Class / Year</label>
-            <select class="inp" id="s-cls">
-              <option value="">— Select —</option>
-              <option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
-              <option>1st Year UG</option><option>2nd Year UG</option><option>3rd Year UG</option><option>4th Year UG</option>
-            </select>
+            <label>Location (District/City)</label>
+            <div class="inp-wrap"><i class="ph ph-map-pin inp-icon"></i><input class="inp inp-icon-pad" id="s-loc" type="text" placeholder="Villupuram"/></div>
           </div>
           <div class="fld">
-            <label>School / College</label>
-            <div class="inp-wrap"><i class="ph ph-buildings inp-icon"></i><input class="inp inp-icon-pad" id="s-school" type="text" placeholder="SRM Institute"/></div>
+            <label>Career Interest / Domain</label>
+            <div class="inp-wrap"><i class="ph ph-briefcase inp-icon"></i><input class="inp inp-icon-pad" id="s-career" type="text" placeholder="Engineering, Medicine..."/></div>
           </div>
         </div>
-        <div class="fld">
-          <label>Password</label>
-          <div class="inp-wrap"><i class="ph ph-lock inp-icon"></i><input class="inp inp-icon-pad" id="s-pass" type="password" placeholder="Min. 6 characters"/></div>
+        <div class="fld-row">
+          <div class="fld">
+            <label>School / College</label>
+            <div class="inp-wrap"><i class="ph ph-buildings inp-icon"></i><input class="inp inp-icon-pad" id="s-school" type="text" placeholder="Institution Name"/></div>
+          </div>
+          <div class="fld">
+            <label>Password</label>
+            <div class="inp-wrap"><i class="ph ph-lock inp-icon"></i><input class="inp inp-icon-pad" id="s-pass" type="password" placeholder="Min. 6 chars"/></div>
+          </div>
         </div>
         <button class="btn-p auth-btn" id="signup-btn" onclick="doSignup()">
           <i class="ph-fill ph-rocket-launch"></i> Create Account

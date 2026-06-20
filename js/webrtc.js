@@ -1,11 +1,27 @@
 // CampusKarma WebRTC Engine — No 'use strict' to avoid silent failures
 // ─────────────────────────────────────────────────────────────────────
 
-// Base STUN-only config (keeps existing behaviour if no TURN is configured)
+// Base STUN & TURN config (TURN is required for 5G/Mobile/Strict Networks)
 const DEFAULT_ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' },
+  // Free Public TURN server for Hackathons (Metered OpenRelay)
+  {
+    urls: 'turn:openrelay.metered.ca:80',
+    username: 'openrelayproject',
+    credential: 'openrelayproject'
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443',
+    username: 'openrelayproject',
+    credential: 'openrelayproject'
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+    username: 'openrelayproject',
+    credential: 'openrelayproject'
+  }
 ];
 
 // Optional: window.RTC_ICE_SERVERS can be injected from server/HTML

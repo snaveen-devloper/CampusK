@@ -13,16 +13,24 @@ function switchAuthTab(tab){
 
 async function doSignup(){
   const btn=document.getElementById('signup-btn');
+  const userType=document.getElementById('s-usertype').value;
   const name=document.getElementById('s-name').value.trim();
   const email=document.getElementById('s-email').value.trim().toLowerCase();
-  const cls=document.getElementById('s-cls').value;
+  const location=document.getElementById('s-loc').value.trim();
+  const careerDomain=document.getElementById('s-career').value.trim();
   const school=document.getElementById('s-school').value.trim();
   const pass=document.getElementById('s-pass').value;
-  if(!name||!email||!cls||!school||!pass){showAuthErr('Please fill all fields.');return;}
+
+  if(!userType||!name||!email||!location||!careerDomain||!school||!pass){showAuthErr('Please fill all fields.');return;}
   if(pass.length<6){showAuthErr('Password must be at least 6 characters.');return;}
+  
   btn.disabled=true;btn.textContent='Creating account…';
   try{
-    const {token,user}=await apiFetch('/auth/signup',{method:'POST',body:{name,email,cls,school,password:pass}});
+    const payload = { 
+      name, email, school, password: pass, 
+      user_type: userType, location, career_domain: careerDomain 
+    };
+    const {token,user}=await apiFetch('/auth/signup',{method:'POST',body:payload});
     setToken(token);ME=user;ME.subjects=Array.isArray(ME.subjects)?ME.subjects:[];ME.ratings=Array.isArray(ME.ratings)?ME.ratings:[];
     btn.disabled=false;btn.textContent='Create Account';
     showOb();

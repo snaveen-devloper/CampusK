@@ -7,9 +7,9 @@ const { User, Boost } = models; // Note: Boost is not yet a separate model, hand
 
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, school, cls } = req.body;
-    if (!name || !email || !password || !school || !cls) {
-      return res.status(400).json({ error: 'All fields are required' });
+    const { name, email, password, school, user_type, location, career_domain } = req.body;
+    if (!name || !email || !password || !school || !user_type) {
+      return res.status(400).json({ error: 'All primary fields are required' });
     }
     
     await initDB();
@@ -28,7 +28,9 @@ router.post('/signup', async (req, res) => {
       email,
       password_hash: hash,
       school,
-      cls,
+      user_type,
+      location,
+      career_domain,
       joined_at: Date.now()
     });
 

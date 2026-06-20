@@ -229,6 +229,15 @@ async function detectLoops(app) {
 
   loops.sort((a, b) => b.score - a.score);
 
+  // ── Auto-register new loops into LoopHealth for self-healing tracking ─────
+  if (app && app.locals && typeof app.locals.registerLoop === 'function') {
+    for (const loop of loops) {
+      app.locals.registerLoop({ ...loop, is_closed: true }).catch(e =>
+        console.warn('[loops] registerLoop skipped:', e.message)
+      );
+    }
+  }
+
   const result = { loops, nodes, edges, total_users_in_graph: users.length };
   setCache(app, result);
   return result;

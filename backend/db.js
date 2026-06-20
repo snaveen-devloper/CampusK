@@ -12,9 +12,11 @@ const Attachment = require('./models/Attachment');
 const Boost = require('./models/Boost');
 const Report = require('./models/Report');
 const AIFeedback = require('./models/AIFeedback');
+const MentorCohort = require('./models/MentorCohort');
 const Quest = require('./models/Quest');
 const PushSubscription = require('./models/PushSubscription');
 const ScheduledJob = require('./models/ScheduledJob');
+const LoopHealth   = require('./models/LoopHealth');
 
 let isConnected = false;
 
@@ -54,6 +56,8 @@ module.exports = {
         AIFeedback,
         Quest,
         PushSubscription,
-        ScheduledJob
+        ScheduledJob,
+        LoopHealth,
+        MentorCohort
     }
 };

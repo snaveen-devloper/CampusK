@@ -12,6 +12,7 @@ const { Message, Session, User, QuizQuestion, QuizAnswer, Activity, AIFeedback }
 const { detectLoops, invalidateLoopCache, router: loopsRouter } = require('./routes/loops');
 const cron = require('node-cron');
 const push = require('./push');
+const { runHealingCycle, registerLoop } = require('./lib/loopHealer');
 
 const app    = express();
 const server = http.createServer(app);
@@ -38,6 +39,7 @@ app.use('/api/quiz',        require('./routes/quiz'));
 app.use('/api/ai',          require('./routes/ai'));
 app.use('/api/activity',    require('./routes/activity'));
 app.use('/api/matchmaking', require('./routes/matchmaking'));
+app.use('/api/coordinator', require('./routes/coordinator'));
 app.use('/api/store',       require('./routes/store'));
 app.use('/api/notes',       require('./routes/notes'));
 app.use('/api/reports',     require('./routes/reports'));
@@ -779,6 +781,76 @@ initDB().then(() => {
   cron.schedule('30 18 * * *', async () => {
     console.log('[CRON] Running daily reset job (18:30 UTC / midnight IST)...');
     // Daily resets & streak breaking logic goes here
+  });
+
+  // ── Self-Healing Loop Engine: every 30 minutes ─────────────────────────────
+  cron.schedule('*/30 * * * *', async () => {
+    try {
+      await runHealingCycle(clients);
+    } catch (err) {
+      console.error('[CRON][loopHealer] Error:', err.message);
+    }
+  });
+
+  // Make registerLoop available to routes (e.g., loops.js detectLoops)
+  app.locals.registerLoop = registerLoop;
+
+  // ── BREAKTHROUGH 3: Dormancy Detection — Proactive Engagement Monitoring ────
+  // Runs every day at 9am IST. Finds mentor-mentee pairs that have gone silent
+  // (no session in 7+ days) and sends a proactive nudge BEFORE they drop off.
+  cron.schedule('30 3 * * *', async () => { // 3:30 UTC = 9:00 IST
+    console.log('[CRON][Dormancy] Running engagement monitoring...');
+    try {
+      const { MentorCohort } = models;
+      const activeCohorts = await MentorCohort.find({ status: 'active' });
+      const DORMANT_DAYS = 7;
+      const now = Date.now();
+
+      for (const cohort of activeCohorts) {
+        for (const menteeUid of cohort.mentee_uids) {
+          const lastSession = await Session.findOne({
+            $or: [
+              { peer1: cohort.mentor_uid, peer2: menteeUid },
+              { peer1: menteeUid, peer2: cohort.mentor_uid }
+            ],
+            status: { $in: ['completed', 'live'] }
+          }).sort({ ended_at: -1 });
+
+          const daysSince = lastSession?.ended_at
+            ? Math.floor((now - lastSession.ended_at) / (1000 * 60 * 60 * 24))
+            : 999;
+
+          if (daysSince >= DORMANT_DAYS) {
+            const mentee = await User.findOne({ uid: menteeUid }, 'name');
+            const mentor = await User.findOne({ uid: cohort.mentor_uid }, 'name');
+
+            // WebSocket nudge (if online)
+            wsSendTo(cohort.mentor_uid, {
+              type: 'dormancy_alert',
+              mentee_uid: menteeUid,
+              mentee_name: mentee?.name || 'your mentee',
+              days_since: daysSince,
+              message: `⚠️ You haven't had a session with ${mentee?.name || 'your mentee'} in ${daysSince} days. Schedule one now to keep momentum!`
+            });
+            wsSendTo(menteeUid, {
+              type: 'dormancy_alert',
+              mentor_uid: cohort.mentor_uid,
+              mentor_name: mentor?.name || 'your mentor',
+              days_since: daysSince,
+              message: `Your mentor ${mentor?.name || ''} is available. It's been ${daysSince} days — reconnect for your next session!`
+            });
+
+            // Dual-channel: Web Push + SMS (Twilio) — SMS reaches rural students even offline
+            push.notifyDormancyAlert(cohort.mentor_uid, mentee?.name || 'your mentee', daysSince, 'mentor').catch(() => {});
+            push.notifyDormancyAlert(menteeUid, mentor?.name || 'your mentor', daysSince, 'mentee').catch(() => {});
+
+            console.log(`[Dormancy] Nudged pair: ${cohort.mentor_uid} ↔ ${menteeUid} (${daysSince} days dormant)`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[CRON][Dormancy] Error:', err.message);
+    }
   });
 
   server.listen(PORT, '0.0.0.0', () => {

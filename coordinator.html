@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agaram Coordinator Dashboard — CampusKarma</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:    #00c9a7;
+      --teal-d:  #009e83;
+      --orange:  #ff6b35;
+      --red:     #e53e3e;
+      --yellow:  #f6c90e;
+      --blue:    #4299e1;
+      --dark:    #0f1117;
+      --card:    #1a1e2e;
+      --card2:   #22273a;
+      --border:  #2a2f45;
+      --text:    #e2e8f0;
+      --muted:   #8892a4;
+      --radius:  14px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0f1117 0%, #1a1e2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    .brand-name { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand-name span { color: var(--teal); }
+    .header-meta { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── LOGIN OVERLAY ── */
+    #login-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,12,18,0.98);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 360px;
+      box-shadow: 0 24px 80px rgba(0,201,167,0.08);
+    }
+    .login-box h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: .5rem; }
+    .login-box p { font-size: .85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .login-box input {
+      width: 100%; padding: 12px 16px;
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: .9rem;
+      margin-bottom: .75rem; outline: none; font-family: inherit;
+      transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: var(--teal); }
+
+    /* ── MAIN LAYOUT ── */
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    .page-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: .25rem; }
+    .page-sub { font-size: .85rem; color: var(--muted); margin-bottom: 2rem; }
+
+    /* ── STAT CARDS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--teal); }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .stat-card.teal::before  { background: var(--teal); }
+    .stat-card.orange::before { background: var(--orange); }
+    .stat-card.red::before   { background: var(--red); }
+    .stat-card.blue::before  { background: var(--blue); }
+    .stat-card.yellow::before{ background: var(--yellow); }
+    .stat-label { font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .5rem; }
+    .stat-value { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+    .stat-value.teal   { color: var(--teal); }
+    .stat-value.orange { color: var(--orange); }
+    .stat-value.red    { color: var(--red); }
+    .stat-value.blue   { color: var(--blue); }
+    .stat-sub { font-size: .72rem; color: var(--muted); margin-top: .3rem; }
+
+    /* ── MATCH ALL BUTTON ── */
+    .action-bar { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px; border: none;
+      font-size: .9rem; font-weight: 600; cursor: pointer;
+      transition: all .2s; font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--teal), var(--teal-d));
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0,201,167,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,201,167,0.4); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+    .match-result { font-size: .85rem; color: var(--muted); padding: 10px 16px; background: var(--card2); border-radius: 8px; display: none; }
+
+    /* ── TWO-COL LAYOUT ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1.4fr; gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title { font-size: .9rem; font-weight: 700; }
+    .panel-badge { font-size: .7rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .badge-red    { background: rgba(229,62,62,.15); color: var(--red); }
+    .badge-yellow { background: rgba(246,201,14,.15); color: var(--yellow); }
+    .badge-teal   { background: rgba(0,201,167,.15); color: var(--teal); }
+    .panel-body { padding: 1rem 1.5rem; max-height: 420px; overflow-y: auto; }
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-track { background: transparent; }
+    .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── ALERTS ── */
+    .alert-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .alert-item:last-child { border-bottom: none; }
+    .alert-icon { font-size: 1.2rem; margin-top: 2px; flex-shrink: 0; }
+    .alert-title { font-size: .85rem; font-weight: 600; margin-bottom: 2px; }
+    .alert-msg { font-size: .75rem; color: var(--muted); }
+    .alert-action {
+      margin-top: 8px; font-size: .72rem; font-weight: 600; color: var(--teal);
+      cursor: pointer; text-decoration: underline;
+    }
+    .empty-state { text-align: center; padding: 2rem; color: var(--muted); font-size: .85rem; }
+
+    /* ── COHORT LIST ── */
+    .cohort-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: background .15s; border-radius: 8px;
+    }
+    .cohort-item:last-child { border-bottom: none; }
+    .cohort-item:hover { background: rgba(255,255,255,.03); }
+    .health-ring {
+      width: 42px; height: 42px; flex-shrink: 0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700;
+      border: 2px solid;
+    }
+    .health-ring.good   { border-color: var(--teal);   color: var(--teal); }
+    .health-ring.mid    { border-color: var(--yellow);  color: var(--yellow); }
+    .health-ring.bad    { border-color: var(--red);     color: var(--red); }
+    .cohort-info { flex: 1; min-width: 0; }
+    .cohort-mentor { font-size: .85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cohort-meta { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .cohort-slots { font-size: .72rem; font-weight: 600; }
+
+    /* ── DONOR REPORT ── */
+    .report-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; }
+    .report-headline { font-size: .95rem; font-weight: 600; color: var(--teal); margin-bottom: 1.25rem; line-height: 1.5; padding: 1rem 1.25rem; background: rgba(0,201,167,.06); border-radius: 8px; border-left: 3px solid var(--teal); }
+    .report-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+    .report-item { text-align: center; padding: 1rem; background: var(--card2); border-radius: 10px; }
+    .report-num { font-size: 1.8rem; font-weight: 800; color: var(--teal); }
+    .report-label { font-size: .72rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── LOADING SPINNER ── */
+    .spinner { width: 20px; height: 20px; border: 2px solid rgba(0,201,167,.3); border-top-color: var(--teal); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 20px;
+      font-size: .85rem; font-weight: 500;
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+      transform: translateY(80px); opacity: 0;
+      transition: all .3s; z-index: 9999;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: var(--teal); color: var(--teal); }
+    #toast.error   { border-color: var(--red);  color: var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay">
+  <div class="login-box">
+    <h2>🎓 Coordinator Login</h2>
+    <p>Agaram Foundation — Admin Command Center</p>
+    <input type="text"     id="login-email"    placeholder="Email address" />
+    <input type="password" id="login-password"  placeholder="Password" />
+    <button class="btn btn-primary" id="login-btn" style="width:100%; justify-content:center; margin-top:.25rem">
+      Sign In →
+    </button>
+    <p id="login-err" style="color:var(--red); font-size:.8rem; margin-top:.75rem; display:none;"></p>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-brand">
+    <div class="logo-dot"></div>
+    <div class="brand-name"><span>Agaram</span> Coordinator</div>
+  </div>
+  <div class="header-meta" id="header-time"></div>
+</header>
+
+<!-- MAIN -->
+<main id="dashboard" style="display:none;">
+  <div class="page-title">Command Center</div>
+  <div class="page-sub" id="last-refresh">Loading system overview…</div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card teal"><div class="stat-label">Total Mentors</div><div class="stat-value teal" id="s-mentors">—</div><div class="stat-sub">Active volunteers</div></div>
+    <div class="stat-card blue"><div class="stat-label">Total Students</div><div class="stat-value blue" id="s-mentees">—</div><div class="stat-sub">Registered mentees</div></div>
+    <div class="stat-card orange"><div class="stat-label">Unmatched Students</div><div class="stat-value orange" id="s-unmatched">—</div><div class="stat-sub">Awaiting assignment</div></div>
+    <div class="stat-card yellow"><div class="stat-label">Active Cohorts</div><div class="stat-value" style="color:var(--yellow)" id="s-cohorts">—</div><div class="stat-sub">Mentor–Mentee groups</div></div>
+    <div class="stat-card teal"><div class="stat-label">Sessions Done</div><div class="stat-value teal" id="s-sessions">—</div><div class="stat-sub">Completed 1-on-1s</div></div>
+    <div class="stat-card red"><div class="stat-label">At-Risk Cohorts</div><div class="stat-value red" id="s-atrisk">—</div><div class="stat-sub">7+ days dormant</div></div>
+    <div class="stat-card teal"><div class="stat-label">Avg Engagement</div><div class="stat-value teal" id="s-engagement">—</div><div class="stat-sub">AI-scored /10</div></div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <button class="btn btn-primary" id="match-all-btn">
+      ⚡ Auto-Match All Unassigned Students
+    </button>
+    <button class="btn btn-outline" id="refresh-btn">↻ Refresh</button>
+    <button class="btn btn-outline" id="report-btn">📊 Donor Report</button>
+    <div class="match-result" id="match-result"></div>
+  </div>
+
+  <!-- ALERTS + COHORTS -->
+  <div class="two-col">
+    <!-- ALERTS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">⚠️ Action Queue</div>
+        <span class="panel-badge badge-red" id="alert-count">Loading…</span>
+      </div>
+      <div class="panel-body" id="alerts-body">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- COHORTS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">👥 Cohort Health (Worst First)</div>
+        <span class="panel-badge badge-yellow" id="cohort-count">Loading…</span>
+      </div>
+      <div class="panel-body" id="cohorts-body">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONOR REPORT -->
+  <div class="report-panel" id="report-panel" style="display:none;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+      <div class="panel-title">📊 Donor Impact Report</div>
+      <button class="btn btn-outline" style="font-size:.75rem; padding:6px 14px;" onclick="document.getElementById('report-panel').style.display='none'">✕ Close</button>
+    </div>
+    <div class="report-headline" id="report-headline">Loading…</div>
+    <div class="report-grid" id="report-grid"></div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+const API = '/api';
+let token = localStorage.getItem('ck_token');
+const headers = () => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'x-coordinator-key': localStorage.getItem('coord_key') || '' });
+
+// Clock
+setInterval(() => {
+  const t = new Date();
+  document.getElementById('header-time').textContent = t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', weekday: 'short', day: 'numeric', month: 'short' }) + ' IST';
+}, 1000);
+
+// Toast
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `show ${type}`;
+  setTimeout(() => t.className = '', 3000);
+}
+
+// Login
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const err      = document.getElementById('login-err');
+  if (!email || !password) { err.textContent = 'Please enter email and password.'; err.style.display = 'block'; return; }
+  try {
+    const res  = await fetch(`${API}/users/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    token = data.token;
+    localStorage.setItem('ck_token', token);
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadAll();
+  } catch (e) {
+    err.textContent = e.message; err.style.display = 'block';
+  }
+});
+
+// Auto-login if token already stored
+if (token) {
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+}
+
+function loadAll() { loadOverview(); loadAlerts(); loadCohorts(); }
+
+// --- OVERVIEW ---
+async function loadOverview() {
+  try {
+    const res  = await fetch(`${API}/coordinator/overview`, { headers: headers() });
+    const data = await res.json();
+    if (!res.ok) { if (res.status === 401 || res.status === 403) return handleLogout(); return; }
+    document.getElementById('s-mentors').textContent    = data.total_mentors;
+    document.getElementById('s-mentees').textContent    = data.total_mentees;
+    document.getElementById('s-unmatched').textContent  = data.unmatched_mentees;
+    document.getElementById('s-cohorts').textContent    = data.active_cohorts;
+    document.getElementById('s-sessions').textContent   = data.completed_sessions;
+    document.getElementById('s-atrisk').textContent     = data.at_risk_cohorts;
+    document.getElementById('s-engagement').textContent = data.avg_engagement_score + '/10';
+    document.getElementById('last-refresh').textContent = `Last refreshed ${new Date().toLocaleTimeString('en-IN')} — System: ${data.system_health.replace('_', ' ').toUpperCase()}`;
+  } catch (e) { console.error(e); }
+}
+
+// --- ALERTS ---
+async function loadAlerts() {
+  try {
+    const res  = await fetch(`${API}/coordinator/alerts`, { headers: headers() });
+    const data = await res.json();
+    const body = document.getElementById('alerts-body');
+    document.getElementById('alert-count').textContent = `${data.alerts?.length || 0} items`;
+    if (!data.alerts?.length) { body.innerHTML = '<div class="empty-state">✅ All clear! No action items.</div>'; return; }
+    body.innerHTML = data.alerts.map(a => {
+      const icons = { unmatched_students: '🔴', dormant_pairs: '🟡', full_mentors: 'ℹ️' };
+      const action = a.action === 'match-all' ? `<div class="alert-action" onclick="triggerMatchAll()">→ Run Auto-Match Now</div>` : '';
+      return `<div class="alert-item">
+        <div class="alert-icon">${icons[a.type] || '⚠️'}</div>
+        <div>
+          <div class="alert-title">${a.message}</div>
+          <div class="alert-msg">Severity: ${a.severity.toUpperCase()}${a.count ? ' — ' + a.count + ' affected' : ''}</div>
+          ${action}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) { document.getElementById('alerts-body').innerHTML = '<div class="empty-state">Error loading alerts.</div>'; }
+}
+
+// --- COHORTS ---
+async function loadCohorts() {
+  try {
+    const res  = await fetch(`${API}/coordinator/cohorts`, { headers: headers() });
+    const data = await res.json();
+    const body = document.getElementById('cohorts-body');
+    document.getElementById('cohort-count').textContent = `${data.total || 0} cohorts`;
+    if (!data.cohorts?.length) { body.innerHTML = '<div class="empty-state">No active cohorts yet. Run Auto-Match to create them.</div>'; return; }
+    body.innerHTML = data.cohorts.map(c => {
+      const h = c.cohort_health;
+      const cls = h >= 70 ? 'good' : h >= 40 ? 'mid' : 'bad';
+      const alumni = c.mentor?.is_alumni ? ' 🎓' : '';
+      return `<div class="cohort-item">
+        <div class="health-ring ${cls}">${h}%</div>
+        <div class="cohort-info">
+          <div class="cohort-mentor">${c.mentor?.name || 'Unknown'}${alumni}</div>
+          <div class="cohort-meta">${c.mentor?.location || 'No location'} · Score: ${(c.mentor?.teaching_score || 0).toFixed(1)}/10</div>
+        </div>
+        <div class="cohort-slots" style="color:${c.mentee_count >= 7 ? 'var(--orange)' : 'var(--teal)'}">
+          ${c.mentee_count}/8
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) { document.getElementById('cohorts-body').innerHTML = '<div class="empty-state">Error loading cohorts.</div>'; }
+}
+
+// --- MATCH ALL ---
+async function triggerMatchAll() {
+  const btn = document.getElementById('match-all-btn');
+  const result = document.getElementById('match-result');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Matching…';
+  try {
+    const res  = await fetch(`${API}/coordinator/match-all`, { method: 'POST', headers: headers() });
+    const data = await res.json();
+    result.style.display = 'block';
+    result.textContent = data.message;
+    toast(`✅ Matched ${data.matched} students!`);
+    setTimeout(loadAll, 800);
+  } catch (e) {
+    toast('❌ Match failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Auto-Match All Unassigned Students';
+  }
+}
+document.getElementById('match-all-btn').addEventListener('click', triggerMatchAll);
+
+// --- REPORT ---
+document.getElementById('report-btn').addEventListener('click', async () => {
+  const panel = document.getElementById('report-panel');
+  panel.style.display = 'block';
+  document.getElementById('report-headline').textContent = 'Loading…';
+  document.getElementById('report-grid').innerHTML = '';
+  try {
+    const res  = await fetch(`${API}/coordinator/report`, { headers: headers() });
+    const data = await res.json();
+    const s    = data.summary;
+    document.getElementById('report-headline').textContent = data.donor_headline;
+    document.getElementById('report-grid').innerHTML = [
+      { num: s.total_mentors,           label: 'Volunteer Mentors' },
+      { num: s.total_students,          label: 'Students Registered' },
+      { num: s.students_matched,        label: 'Students Matched' },
+      { num: s.match_rate_pct + '%',    label: 'Match Rate' },
+      { num: s.sessions_completed,      label: 'Sessions Completed' },
+      { num: s.avg_session_engagement,  label: 'Avg Engagement Score' },
+      { num: s.students_improving_pct + '%', label: 'Students Improving' },
+    ].map(r => `<div class="report-item"><div class="report-num">${r.num}</div><div class="report-label">${r.label}</div></div>`).join('');
+  } catch (e) {
+    document.getElementById('report-headline').textContent = 'Error loading report.';
+  }
+});
+
+// --- REFRESH ---
+document.getElementById('refresh-btn').addEventListener('click', () => { loadAll(); toast('Refreshed!'); });
+
+function handleLogout() {
+  localStorage.removeItem('ck_token');
+  location.reload();
+}
+
+if (token) loadAll();
+</script>
+</body>
+</html>
